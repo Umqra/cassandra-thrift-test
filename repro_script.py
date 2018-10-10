@@ -70,7 +70,7 @@ class ThriftMultigetTestCase(unittest2.TestCase):
             cluster.set_log_level("TRACE")
             cluster.populate(3, debug=True)
             cluster.start()
-            log('Populated nodes:\n  {}')
+            log('Populate nodes')
             ThriftMultigetTestCase._prepare_for_test(cluster)
 
             cluster.nodetool('settraceprobability 1')
