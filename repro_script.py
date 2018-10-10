@@ -37,8 +37,8 @@ class GracefulCluster:
     def __exit__(self, exc_type, exc_value, traceback):
         if exc_type is not None:
             log('Exception of type {} during the test: {}. Traceback: {}'.format(exc_type, exc_value, traceback))
-        self.cluster.remove()
-        log('Cluster removed')
+        self.cluster.stop()
+        log('Cluster stopped')
         return False
 
     @staticmethod
@@ -53,13 +53,20 @@ class ThriftMultigetTestCase(unittest2.TestCase):
         'request_timeout_in_ms': '3600000',
         'start_rpc': 'true',
         'hinted_handoff_enabled': 'false', }
-    CassandraVersionList = ['2.2.8', '2.2.9', '3.0.0-rc2',
-                            '3.0.0', '3.1', '3.2', '3.3', '3.4', '3.5', '3.6', '3.7', '3.8',
-                            '3.9', '3.10',
-                            '3.11.0', '3.11.1', '3.11.2', '3.11.3']
 
-    def test_multiget_query(self):
-        for cassandra_version in ThriftMultigetTestCase.CassandraVersionList:
+    def test_multiget_query_3_11_x(self):
+        for cassandra_version in ['3.11.0', '3.11.1', '3.11.2', '3.11.3']:
+            with self.subTest(cassandra_version=cassandra_version):
+                self.assertTrue(self.check_cassandra_version(cassandra_version))
+
+    def test_multiget_query_3_x(self):
+        for cassandra_version in ['3.0.0-rc2', '3.0.0', '3.1', '3.2', '3.3', '3.4', '3.5', '3.6', '3.7', '3.8', '3.9',
+                                  '3.10']:
+            with self.subTest(cassandra_version=cassandra_version):
+                self.assertTrue(self.check_cassandra_version(cassandra_version))
+
+    def test_multiget_query_2_x(self):
+        for cassandra_version in ['2.2.8', '2.2.9', '2.2.10', '2.2.11', '2.2.12', '2.2.13']:
             with self.subTest(cassandra_version=cassandra_version):
                 self.assertTrue(self.check_cassandra_version(cassandra_version))
 
