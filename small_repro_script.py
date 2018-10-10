@@ -3,7 +3,7 @@
 import ccmlib.cluster
 import pycassa
 
-values = list(map(str, range(100)))
+values = list(map(str, range(10)))
 keyspace, table = 'test_keyspace', 'test_table'
 
 cluster = ccmlib.cluster.Cluster('.', 'thrift-test', partitioner='RandomPartitioner', cassandra_version='3.11.2')
@@ -16,7 +16,7 @@ cluster.nodelist()[2].stop()
 pool = pycassa.ConnectionPool(keyspace, server_list=['127.0.0.1', '127.0.0.2'], timeout=0.5)
 cf = pycassa.ColumnFamily(pool, table)
 for value in values:
-    cf.insert(value, {'value': value})
+    cf.insert(value, {'value': value}, write_consistency_level=pycassa.cassandra.ttypes.ConsistencyLevel.QUORUM)
 cluster.nodelist()[2].start()
 cluster.nodelist()[2].wait_for_thrift_interface()
 

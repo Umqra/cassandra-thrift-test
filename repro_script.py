@@ -92,7 +92,7 @@ class ThriftMultigetTestCase(unittest2.TestCase):
         pool = pycassa.ConnectionPool(Keyspace, server_list=['127.0.0.1', '127.0.0.2'], timeout=0.5)
         cf = pycassa.ColumnFamily(pool, TableName)
         for key, value in ThriftMultigetTestCase.Payload:
-            cf.insert(key, {'value': value})
+            cf.insert(key, {'value': value}, write_consistency_level=pycassa.ConsistencyLevel.QUORUM)
         log('Inserted {} keys in the table {}.{}'.format(len(ThriftMultigetTestCase.Payload), Keyspace, TableName))
 
         nodes_cluster.nodelist()[2].start()
