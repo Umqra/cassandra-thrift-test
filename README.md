@@ -4,7 +4,7 @@ It seems that in Cassandra 3.0.0 a nasty bug was introduced in `multiget` Thrift
 When one tries to read data from several partitions with a single `multiget` query and `DigestMismatch` exception is raised during this query processing, request coordinator prematurely terminates response stream right at the point where the first `DigestMismatch` error is occurring. This leads to situation where clients "do not see" some data contained in the database.
 
 We managed to reproduce this bug in all versions of Cassandra starting with v3.0.0. The pre-release version 3.0.0-rc2 works correctly. 
-It looks like [refactoring of iterator transformation hierarchy](https://github.com/apache/cassandra/commit/609497471441273367013c09a1e0e1c990726ec7) related to [CASSANDRA-9975](https://issues.apache.org/jira/browse/CASSANDRA-9975) is causing incorrect behaviour.
+It looks like [refactoring of iterator transformation hierarchy](https://github.com/apache/cassandra/commit/609497471441273367013c09a1e0e1c990726ec7) related to [CASSANDRA-9975](https://issues.apache.org/jira/browse/CASSANDRA-9975) triggers incorrect behaviour.
 
 When concatenated iterator is returned from the [StorageProxy.fetchRows(...)](https://github.com/apache/cassandra/blob/a05785d82c621c9cd04d8a064c38fd2012ef981c/src/java/org/apache/cassandra/service/StorageProxy.java#L1770),
 Cassandra starts to consume this combined iterator. Because of `DigestMismatch` exception some elements of this combined iterator contain additional `ThriftCounter`, that was added during [DataResolver.resolve(...)](https://github.com/apache/cassandra/blob/ee9e06b5a75c0be954694b191ea4170456015b98/src/java/org/apache/cassandra/service/reads/DataResolver.java#L120) execution.
